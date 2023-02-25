@@ -22,7 +22,7 @@
   },
   "type": "module",
   "author": { "name": "Marco Rojas", "email": "10587527+MrcRjs@users.noreply.github.com"},
-  "license": "Copyright 2023, Marco Rojas",
+  "license": "GNU AGPLv3 ",
   "description": "",
   "dependencies": {
     "node-fetch": "^2.6.9"
