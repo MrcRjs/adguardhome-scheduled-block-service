@@ -9,6 +9,7 @@ import {
 
 const USAGE_MSG =
   "aghblock [block|unblock|unblockall|list|status] <service,service2,service3>";
+
 (async function init() {
   const envVarsDefined = verifyDefinedEnvVariables([
     "AGH_SERVER",
