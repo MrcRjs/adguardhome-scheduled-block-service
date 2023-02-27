@@ -29,17 +29,17 @@ async function main() {
         }
       } else if (command === "status") {
         const currentlyBlocked = await getAGHBlockedStatus();
-        console.log("[AGH] Currently blocking:", currentlyBlocked.join(", "));
+        console.log("Currently blocking:", currentlyBlocked.join(","));
         return 0;
       } else if (command === "list") {
         const servicesList = Array.from(
           new Set(await getBlockableServicesIDs())
         ).join(",");
-        console.log("[AGH] Available services to block\n", servicesList);
+        console.log("Available services to block\n", servicesList);
         return 0;
       } else if (command === "unblockall") {
         await unblockALLAGHServices();
-        console.log("[AGH] All services are unblocked now, have fun!");
+        console.log("All services are unblocked now, have fun!");
         return 0;
       } else {
         console.error(
