@@ -3,7 +3,7 @@ import fetch, { RequestInit } from "node-fetch";
 const { AGH_SERVER, AGH_USER, AGH_PASS } = process.env;
 
 const USAGE_MSG =
-  "aghblock [block|unblock|unblockall|list|status] <service,service2,service3>";
+  "aghblock [block|unblock|blockall|unblockall|list|status] <service,service2,service3>";
 
 async function main() {
   const environmentVariables = verifyDefinedEnvVariables([
@@ -37,8 +37,12 @@ async function main() {
         ).join(",");
         console.log("Available services to block\n", servicesList);
         return 0;
+      } else if (command === "blockall") {
+        await blockAllAGHServices();
+        console.log("\nAll services are blocked.");
+        return 0;
       } else if (command === "unblockall") {
-        await unblockALLAGHServices();
+        await unblockAllAGHServices();
         console.log("All services are unblocked now, have fun!");
         return 0;
       } else {
@@ -224,13 +228,28 @@ async function blockAGHServices(services: string[]) {
   console.log("Now blocking", blockedServicesUpdated.join(","));
 }
 
-async function unblockALLAGHServices() {
+async function unblockAllAGHServices() {
   const blockServicesResponse = await fetchAGHAPI(
     AGH_ENDPOINTS.SET_BLOCKED_SERVICES,
     { method: "POST" },
     []
   );
   console.log(blockServicesResponse);
+}
+
+async function blockAllAGHServices() {
+  const blockableServices = await getBlockableServicesIDs();
+  await fetchAGHAPI(
+    AGH_ENDPOINTS.SET_BLOCKED_SERVICES,
+    { method: "POST" },
+    blockableServices
+  );
+
+  const blockedServicesUpdated = await fetchAGHAPI(
+    AGH_ENDPOINTS.CURRENT_BLOCKED_SERVICES
+  );
+
+  console.log("Now blocking", blockedServicesUpdated.join(","));
 }
 
 async function getBlockableServicesIDs() {
