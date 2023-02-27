@@ -4,10 +4,10 @@
 
 While this can be installed in any server with crontab, I recommend installing this in a local network server or even better in the same adguardhome server host due to the basic authentication security used by AdguardHome.
 
-[AdguardHome compatible w adguard-home-api v0.2.0](https://github.com/AdguardTeam/AdGuardHome#api)
-[git](https://openwrt.org/packages/pkgdata/git)
-[node](https://openwrt.org/packages/pkgdata/node)
-[node-npm](https://openwrt.org/packages/pkgdata/node-npm)
+- [AdguardHome compatible w adguard-home-api v0.2.0](https://github.com/AdguardTeam/AdGuardHome#api)
+- [git](https://openwrt.org/packages/pkgdata/git)
+- [node](https://openwrt.org/packages/pkgdata/node)
+- [node-npm](https://openwrt.org/packages/pkgdata/node-npm)
 
 ## Installation
 
@@ -21,7 +21,7 @@ $ cd aghblock && sudo make install
 Once installation is complete you need to set your own configuration adding the following environment variables to your `.bash_profile` or `.profile`.
 
 ```
-export AGH_SERVER="127.0.0.1"
+export AGH_SERVER="127.0.0.1:2023" # Your adguard home server ip and port
 export AGH_USER="your_agh_username"
 export AGH_PASS="your_agh_password"
 ```
