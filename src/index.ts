@@ -27,6 +27,15 @@ async function main() {
           console.error("Missing list of services to block: ", USAGE_MSG);
           return -1;
         }
+      } else if (command === "unblock") {
+        if (process.argv.length > 3) {
+          const unblockServices = process.argv[3].split(",");
+          await unblockAGHServices(unblockServices);
+          return 0;
+        } else {
+          console.error("Missing list of services to unblock: ", USAGE_MSG);
+          return -1;
+        }
       } else if (command === "status") {
         const currentlyBlocked = await getAGHBlockedStatus();
         console.log("Currently blocking:", currentlyBlocked.join(","));
@@ -263,6 +272,31 @@ async function getBlockableServicesIDs() {
 
 async function getAGHBlockedStatus() {
   return await fetchAGHAPI(AGH_ENDPOINTS.CURRENT_BLOCKED_SERVICES);
+}
+
+async function unblockAGHServices(services: string[]) {
+  const validServices = await validateBlockableServices(services);
+
+  const currentlyBlockedServices = await fetchAGHAPI(
+    AGH_ENDPOINTS.CURRENT_BLOCKED_SERVICES
+  );
+
+  const blockedServicesToUpdate = new Set(currentlyBlockedServices);
+  validServices.map((s) => blockedServicesToUpdate.delete(s));
+
+  await fetchAGHAPI(
+    AGH_ENDPOINTS.SET_BLOCKED_SERVICES,
+    { method: "POST" },
+    Array.from(blockedServicesToUpdate)
+  );
+
+  console.log("\n\nSuccesfully unblocked", validServices.join(","));
+
+  const blockedServicesUpdated = await fetchAGHAPI(
+    AGH_ENDPOINTS.CURRENT_BLOCKED_SERVICES
+  );
+
+  console.log("\n\nNow blocking", blockedServicesUpdated.join(","));
 }
 
 main();
