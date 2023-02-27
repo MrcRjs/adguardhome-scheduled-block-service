@@ -6,13 +6,13 @@ const USAGE_MSG =
   "aghblock [block|unblock|unblockall|list|status] <service,service2,service3>";
 
 async function main() {
-  const envVarsDefined = verifyDefinedEnvVariables([
+  const environmentVariables = verifyDefinedEnvVariables([
     "AGH_SERVER",
     "AGH_USER",
     "AGH_USER",
   ]);
-  if (envVarsDefined.missing) {
-    console.error(envVarsDefined.missingErrorMsg);
+  if (environmentVariables.missing) {
+    console.error(environmentVariables.missingErrorMsg);
     return -1;
   }
   try {
@@ -42,7 +42,11 @@ async function main() {
         console.log("[AGH] All services are unblocked now, have fun!");
         return 0;
       } else {
-        console.error("Usage: ");
+        console.error(
+          `Option [${command}] not found. \n`,
+          "Usage: ",
+          USAGE_MSG
+        );
         return -2;
       }
     } else {
@@ -161,16 +165,50 @@ async function fetchAGHAPI(
   return response;
 }
 
-export async function blockAGHServices(services: string[]) {
-  // TODO: Validate services input is an actual blockable service
-  // const blockableServicesRes = await getBlockableServicesIDs();
+async function validateBlockableServices(
+  services: string[]
+): Promise<string[]> {
+  const blockableServicesRes: Set<string> = new Set(
+    await getBlockableServicesIDs()
+  );
+  const invalidServices: string[] = [];
+  const validServices = services.filter((s) => {
+    const serviceExists = blockableServicesRes.has(s);
+    return serviceExists ? true : invalidServices.push(s) && false;
+  });
 
-  const blockedServices = await fetchAGHAPI(
+  const USAGE_LIST_MSG =
+    "\nTo view a full list of supported services run: aghblock list";
+  const BLOCKLIST_SUPPORT_MSG =
+    "\n\nTo learn more about creating custom blocklists in AdguardHome: \nhttps://github.com/AdguardTeam/AdGuardHome/wiki/Hosts-Blocklists\n\n";
+  if (invalidServices.length > 0) {
+    if (invalidServices.length > 1) {
+      console.error(
+        `\nServices "${invalidServices.join(",")}" are not supported.`,
+        USAGE_LIST_MSG,
+        BLOCKLIST_SUPPORT_MSG
+      );
+    } else {
+      console.error(
+        `\n[Warning] Service "${invalidServices[0]}" is not supported.`,
+        USAGE_LIST_MSG,
+        BLOCKLIST_SUPPORT_MSG
+      );
+    }
+  }
+
+  return validServices;
+}
+
+async function blockAGHServices(services: string[]) {
+  const validServices = await validateBlockableServices(services);
+
+  const currentlyBlockedServices = await fetchAGHAPI(
     AGH_ENDPOINTS.CURRENT_BLOCKED_SERVICES
   );
 
   const uniqueServices: string[] = Array.from(
-    new Set([...services, ...blockedServices])
+    new Set([...validServices, ...currentlyBlockedServices])
   );
 
   await fetchAGHAPI(
@@ -183,10 +221,10 @@ export async function blockAGHServices(services: string[]) {
     AGH_ENDPOINTS.CURRENT_BLOCKED_SERVICES
   );
 
-  console.log("[AGH] Now blocking ", JSON.stringify(blockedServicesUpdated));
+  console.log("Now blocking", blockedServicesUpdated.join(","));
 }
 
-export async function unblockALLAGHServices() {
+async function unblockALLAGHServices() {
   const blockServicesResponse = await fetchAGHAPI(
     AGH_ENDPOINTS.SET_BLOCKED_SERVICES,
     { method: "POST" },
@@ -195,7 +233,7 @@ export async function unblockALLAGHServices() {
   console.log(blockServicesResponse);
 }
 
-export async function getBlockableServicesIDs() {
+async function getBlockableServicesIDs() {
   const blockableServicesRes = await fetchAGHAPI(
     AGH_ENDPOINTS.BLOCKABLE_SERVICES
   );
@@ -204,7 +242,7 @@ export async function getBlockableServicesIDs() {
   );
 }
 
-export async function getAGHBlockedStatus() {
+async function getAGHBlockedStatus() {
   return await fetchAGHAPI(AGH_ENDPOINTS.CURRENT_BLOCKED_SERVICES);
 }
 
