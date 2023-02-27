@@ -4,12 +4,13 @@ const { AGH_SERVER, AGH_USER, AGH_PASS } = process.env;
 
 const USAGE_MSG =
   "aghblock [block|unblock|blockall|unblockall|list|status] <service,service2,service3>";
-
+const EXTENDED_HELP_MESSAGE =
+  "\n\nTo learn more about aghblock go to: \nhttps://github.com/MrcRjs/adguardhome-scheduled-block-service/blob/main/README.md";
 async function main() {
   const environmentVariables = verifyDefinedEnvVariables([
     "AGH_SERVER",
     "AGH_USER",
-    "AGH_USER",
+    "AGH_PASS",
   ]);
   if (environmentVariables.missing) {
     console.error(environmentVariables.missingErrorMsg);
@@ -38,7 +39,11 @@ async function main() {
         }
       } else if (command === "status") {
         const currentlyBlocked = await getAGHBlockedStatus();
-        console.log("Currently blocking:", currentlyBlocked.join(","));
+        if (currentlyBlocked.length === 0) {
+          console.log("All services are unblocked.");
+        } else {
+          console.log("Currently blocking:", currentlyBlocked.join(","));
+        }
         return 0;
       } else if (command === "list") {
         const servicesList = Array.from(
@@ -58,12 +63,13 @@ async function main() {
         console.error(
           `Option [${command}] not found. \n`,
           "Usage: ",
-          USAGE_MSG
+          USAGE_MSG,
+          EXTENDED_HELP_MESSAGE
         );
         return -2;
       }
     } else {
-      console.error("Usage: ", USAGE_MSG);
+      console.error("Usage: ", USAGE_MSG, EXTENDED_HELP_MESSAGE);
       return -2;
     }
   } catch (err) {
@@ -165,7 +171,8 @@ async function fetchAGHAPI(
     ...options,
     body: body ? JSON.stringify(body) : undefined,
   };
-  const response = await fetch(AGH_SERVER + route, params);
+  const aghServerURL = "http://" + AGH_SERVER + "/control";
+  const response = await fetch(aghServerURL + route, params);
 
   if (response.status >= 400) {
     throw new Error(`${response.status} ${response.statusText}`);
