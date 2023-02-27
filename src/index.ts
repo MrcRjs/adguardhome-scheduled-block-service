@@ -38,7 +38,7 @@ async function main() {
         console.log("Available services to block\n", servicesList);
         return 0;
       } else if (command === "unblockall") {
-        await unblockALLAGHServices();
+        await unblockAllAGHServices();
         console.log("All services are unblocked now, have fun!");
         return 0;
       } else {
@@ -224,7 +224,7 @@ async function blockAGHServices(services: string[]) {
   console.log("Now blocking", blockedServicesUpdated.join(","));
 }
 
-async function unblockALLAGHServices() {
+async function unblockAllAGHServices() {
   const blockServicesResponse = await fetchAGHAPI(
     AGH_ENDPOINTS.SET_BLOCKED_SERVICES,
     { method: "POST" },
