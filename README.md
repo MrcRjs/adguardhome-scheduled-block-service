@@ -1,4 +1,4 @@
-# AdguardHome Schedule Block Services
+# AdguardHome Scheduled Service Blocker
 
 ## Pre-requirements
 
