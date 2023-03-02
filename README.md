@@ -2,7 +2,7 @@
 
 ## Pre-requirements
 
-While this can be installed in any server with crontab, I recommend installing this in a local network server or even better in the same adguardhome server host due to the basic authentication security used by AdguardHome.
+While this can be installed in any server with crontab, I recommend installing it in a local network server or in the same server host adguardhome due to the basic authentication security used by AdguardHome.
 
 - [AdguardHome compatible w adguard-home-api v0.2.0](https://github.com/AdguardTeam/AdGuardHome#api)
 - [git](https://openwrt.org/packages/pkgdata/git)
