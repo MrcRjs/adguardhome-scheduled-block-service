@@ -1,5 +1,7 @@
 # AdguardHome Scheduled Service Blocker
 
+![Adguardhome Block Services CLI demo](img/aghblock_demo.gif)
+
 ## Pre-requirements
 
 While this can be installed in any server with crontab, I recommend installing it in a local network server or in the same server host adguardhome due to the basic authentication security used by AdguardHome.
